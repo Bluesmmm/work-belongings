@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞书卡片预览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .card-header.blue { background: #3370FF; }
+        .card-header.green { background: #34D399; }
+        .card-header.orange { background: #FF9900; }
+        .card-header.yellow { background: #F59E0B; }
+        .card-header.red { background: #EF4444; }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 16px;
+        }
+        
+        .section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .section-content {
+            color: #666;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #e5e5e5;
+            margin: 16px 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e5e5;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #34D399;
+            border-radius: 4px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 12px 0;
+        }
+        
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #3370FF;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        .deliverable-list {
+            list-style: none;
+        }
+        
+        .deliverable-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .deliverable-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-icon {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        
+        .status-done { color: #34D399; }
+        .status-pending { color: #FF9900; }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-primary {
+            background: #3370FF;
+            color: white;
+        }
+        
+        .btn-default {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .tag-blue {
+            background: #E8F4FF;
+            color: #3370FF;
+        }
+        
+        .tag-green {
+            background: #E6F9F0;
+            color: #34D399;
+        }
+        
+        .tag-orange {
+            background: #FFF4E6;
+            color: #FF9900;
+        }
+        
+        .highlight-item {
+            padding: 8px 0;
+            color: #333;
+        }
+        
+        .highlight-item::before {
+            content: "🏆 ";
+        }
+        
+        .risk-item {
+            padding: 8px 0;
+            color: #FF9900;
+        }
+        
+        .risk-item::before {
+            content: "⚠️ ";
+        }
+        
+        .note {
+            background: #FFFBE6;
+            border-left: 4px solid #F59E0B;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .form-select, .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .checkbox-item input {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 飞书学习监督机器人 - 卡片预览</h1>
+        
+        <!-- 每日提醒卡片 -->
+        <div class="card">
+            <div class="card-header blue">
+                📚 今日学习计划 (第1周)
+            </div>
+            <div class="card-body">
+                <div class="section">
+                    <span class="tag tag-blue">🎯 基础基座</span>
+                    <span class="tag tag-green" style="margin-left: 8px;">📌 vLLM单机服务搭建</span>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="section">
+                    <div class="section-title">📝 今日重点</div>
+                    <div class="section-content">
+                        把仓库搭好，让 3B 模型在单机上「能启动、能调用、能看日志」。
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">📦 本周交付物</div>
+                    <ul class="deliverable-list">
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span>仓库目录结构搭建</span>
+                        </li>
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span>serving/launch.py</span>
+                        </li>
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span>client/smoke_test.py</span>
+                        </li>
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span>README Quickstart</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="note">
+                    💡 Tips: 第一周只求「跑通+可复现」，别急着优化速度
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary">📝 今日打卡</button>
+                    <button class="btn btn-default">📊 查看进度</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 打卡表单卡片 -->
+        <div class="card">
+            <div class="card-header green">
+                📋 第1周进度打卡
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">今日完成项（可多选）：</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox"> 仓库目录结构搭建
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox"> serving/launch.py
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox"> client/smoke_test.py
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox"> README Quickstart
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <label class="form-label">今日投入时长：</label>
+                    <select class="form-select">
+                        <option>⏰ 1-2 小时</option>
+                        <option selected>⏰ 2-3 小时</option>
+                        <option>⏰ 3-4 小时</option>
+                        <option>⏰ 4-5 小时</option>
+                        <option>⏰ 5+ 小时</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">今日满意度：</label>
+                    <select class="form-select">
+                        <option>😊 很满意</option>
+                        <option>🙂 满意</option>
+                        <option selected>😐 一般</option>
+                        <option>🙁 不满意</option>
+                        <option>😔 很不满意</option>
+                    </select>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <label class="form-label">遇到卡点（选填）：</label>
+                    <input type="text" class="form-input" placeholder="描述今天遇到的困难...">
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary">✅ 提交打卡</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 周报卡片 -->
+        <div class="card">
+            <div class="card-header blue">
+                📊 第1周学习周报
+            </div>
+            <div class="card-body">
+                <div class="section">
+                    <strong>阶段：</strong>基础基座 | <strong>主题：</strong>vLLM单机服务搭建
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="section">
+                    <div class="section-title">整体完成度</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 50%"></div>
+                    </div>
+                    <div style="text-align: right; color: #999; font-size: 14px;">50%</div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">22h</div>
+                        <div class="stat-label">投入时长 / 28h</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">打卡天数 / 7天</div>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="section">
+                    <div class="section-title">📦 本周交付物</div>
+                    <ul class="deliverable-list">
+                        <li class="deliverable-item">
+                            <span class="status-icon status-done">✅</span>
+                            <span>仓库目录结构搭建</span>
+                        </li>
+                        <li class="deliverable-item">
+                            <span class="status-icon status-done">✅</span>
+                            <span>serving/launch.py</span>
+                        </li>
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span>client/smoke_test.py</span>
+                        </li>
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span>README Quickstart</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="section">
+                    <div class="section-title">🏆 本周亮点</div>
+                    <div class="highlight-item">完成交付物：仓库目录结构</div>
+                    <div class="highlight-item">本周有 3 天高效学习（≥4小时）</div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">⚠️ 风险与调整</div>
+                    <div class="risk-item">本周投入 22h，低于目标 28h</div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="section">
+                    <div class="section-title">📅 下周计划 (第2周)</div>
+                    <div class="section-content">
+                        <strong>主题：</strong>监控体系搭建<br>
+                        Prometheus + Grafana 监控面板
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary">📤 分享周报</button>
+                    <button class="btn btn-default">📈 查看详情</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 打卡成功卡片 -->
+        <div class="card">
+            <div class="card-header green">
+                ✅ 打卡成功！
+            </div>
+            <div class="card-body">
+                <div class="section">
+                    <strong>第1周打卡已记录</strong><br><br>
+                    ⏱️ 今日投入：<strong>4.5</strong> 小时<br>
+                    😊 满意度：<strong>😊</strong>
+                </div>
+                
+                <div class="note" style="margin-top: 16px;">
+                    💪 积跬步以至千里，继续保持！
+                </div>
+            </div>
+        </div>
+        
+        <!-- 里程碑达成卡片 -->
+        <div class="card">
+            <div class="card-header yellow">
+                🎉 里程碑达成！
+            </div>
+            <div class="card-body">
+                <div class="section">
+                    <strong>恭喜完成 M1：单机服务可复现！</strong><br><br>
+                    vLLM OpenAI兼容服务 + 可观测v0
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="section">
+                    <div class="section-title">✅ 完成标准验证</div>
+                    <div class="section-content">
+                        新环境30分钟跑通，metrics可见
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">42h</div>
+                        <div class="stat-label">投入时长</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">打卡次数</div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary">🚀 下一里程碑</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 整体进度卡片 -->
+        <div class="card">
+            <div class="card-header blue">
+                📈 学习总进度
+            </div>
+            <div class="card-body">
+                <div class="section">
+                    <strong>当前进度：第 1 周 / 共 22 周</strong>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 5%"></div>
+                    </div>
+                    <div style="font-family: monospace; color: #666; margin-top: 4px;">
+                        █░░░░░░░░░░░░░░░░░░░ 5%
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">22h</div>
+                        <div class="stat-label">累计投入</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">打卡天数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">0/7</div>
+                        <div class="stat-label">里程碑</div>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="section">
+                    <div class="section-title">里程碑进度</div>
+                    <ul class="deliverable-list">
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span><strong>M1 单机服务可复现</strong> (W1)</span>
+                        </li>
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span><strong>M2 压测闭环</strong> (W3)</span>
+                        </li>
+                        <li class="deliverable-item">
+                            <span class="status-icon status-pending">⏳</span>
+                            <span><strong>M3 K8s单租户可交付</strong> (W6)</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>

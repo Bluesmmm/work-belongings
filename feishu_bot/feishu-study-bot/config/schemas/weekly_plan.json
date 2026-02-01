@@ -1,0 +1,120 @@
+{
+  "weeks": [
+    {
+      "week_num": 1,
+      "start_date": "2026-02-01",
+      "end_date": "2026-02-07",
+      "stage": "基础基座",
+      "theme": "vLLM单机服务搭建",
+      "focus": "把仓库搭好，让 3B 模型在单机上能启动、能调用、能看日志",
+      "main_goal": "vLLM 交付模板",
+      "deep_dive": "TRL（SFT/DPO 最小闭环 + 产物接入 vLLM）",
+      "trl_task": "装环境 + 跑通 SFTTrainer 最小示例",
+      "slime_task": "暂不深入",
+      "openrlhf_task": "暂不深入",
+      "risks": "第一周只求跑通+可复现，别急着优化速度",
+      "deliverables": [
+        {
+          "name": "仓库目录结构搭建",
+          "description": "serving/client/docs 等目录",
+          "acceptance_criteria": "目录结构清晰"
+        },
+        {
+          "name": "serving/launch.py",
+          "description": "一条命令启动 vLLM（OpenAI 兼容接口）",
+          "acceptance_criteria": "30分钟内能启动服务"
+        },
+        {
+          "name": "client/smoke_test.py",
+          "description": "最小调用脚本",
+          "acceptance_criteria": "能成功调用API并返回结果"
+        },
+        {
+          "name": "README Quickstart",
+          "description": "从零到跑通的快速开始文档",
+          "acceptance_criteria": "新用户能按文档跑通"
+        }
+      ]
+    },
+    {
+      "week_num": 2,
+      "start_date": "2026-02-08",
+      "end_date": "2026-02-14",
+      "stage": "基础基座",
+      "theme": "监控体系搭建",
+      "focus": "把监控接上：能看到吞吐、延迟、队列、显存，出一张默认面板",
+      "main_goal": "vLLM 交付模板",
+      "deep_dive": "TRL（SFT/DPO 最小闭环 + 产物接入 vLLM）",
+      "trl_task": "装环境 + 跑通 SFTTrainer",
+      "slime_task": "暂不深入",
+      "openrlhf_task": "暂不深入",
+      "risks": "面板先做少而关键，后续再细化",
+      "deliverables": [
+        {
+          "name": "observability/docker-compose",
+          "description": "一键拉起 Prometheus + Grafana",
+          "acceptance_criteria": "docker-compose up 能启动监控栈"
+        },
+        {
+          "name": "Prometheus 抓取配置",
+          "description": "抓取 vLLM /metrics",
+          "acceptance_criteria": "指标能被抓取并显示"
+        },
+        {
+          "name": "Grafana dashboard v0",
+          "description": "≥6 张图：QPS/吞吐、P50/P95、首 token 延迟、队列/并发、显存等",
+          "acceptance_criteria": "面板能显示曲线"
+        },
+        {
+          "name": "监控文档",
+          "description": "docs/quickstart.md 增加怎么看指标",
+          "acceptance_criteria": "能讲清哪些图用于判断正常/拥塞/OOM"
+        }
+      ]
+    }
+  ],
+  "milestones": [
+    {
+      "name": "M1 单机服务可复现",
+      "target_week": 1,
+      "description": "vLLM OpenAI兼容服务 + 可观测v0",
+      "completion_criteria": "新环境30分钟跑通，metrics可见"
+    },
+    {
+      "name": "M2 压测闭环",
+      "target_week": 3,
+      "description": "压测脚本+报告模板",
+      "completion_criteria": "同配置重复跑结果稳定，报告产出自动化"
+    },
+    {
+      "name": "M3 K8s单租户可交付",
+      "target_week": 6,
+      "description": "Docker+K8s最小部署",
+      "completion_criteria": "集群部署可用，GPU调度正确，监控可抓"
+    },
+    {
+      "name": "M4 多租户v0",
+      "target_week": 9,
+      "description": "namespace隔离，一租户一实例",
+      "completion_criteria": "2租户互不影响，策略可配置"
+    },
+    {
+      "name": "M5 性能专项可量化",
+      "target_week": 13,
+      "description": "调参/量化至少1个点做深",
+      "completion_criteria": "提升有数据证明，边界与回退明确"
+    },
+    {
+      "name": "M6 微调+评测+上线闭环",
+      "target_week": 17,
+      "description": "LoRA微调+评测回归+发布/回滚",
+      "completion_criteria": "一键跑通闭环，报告可读"
+    },
+    {
+      "name": "M7 开源v1.0发布",
+      "target_week": 22,
+      "description": "文档/贡献/发布流程齐全",
+      "completion_criteria": "tag v1.0 + changelog + demo脚本"
+    }
+  ]
+}

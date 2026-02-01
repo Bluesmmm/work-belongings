@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  study-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: feishu-study-bot:latest
+    container_name: feishu-study-bot
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - FEISHU_APP_ID=${FEISHU_APP_ID}
+      - FEISHU_APP_SECRET=${FEISHU_APP_SECRET}
+      - FEISHU_ENCRYPT_KEY=${FEISHU_ENCRYPT_KEY:-}
+      - FEISHU_VERIFICATION_TOKEN=${FEISHU_VERIFICATION_TOKEN:-}
+      - BOT_NAME=${BOT_NAME:-学习助手}
+      - DEFAULT_CHAT_ID=${DEFAULT_CHAT_ID:-}
+      - DAILY_REMINDER_HOUR=${DAILY_REMINDER_HOUR:-9}
+      - DAILY_REMINDER_MINUTE=${DAILY_REMINDER_MINUTE:-0}
+      - CHECKIN_REMINDER_HOUR=${CHECKIN_REMINDER_HOUR:-21}
+      - CHECKIN_REMINDER_MINUTE=${CHECKIN_REMINDER_MINUTE:-0}
+      - WEEKLY_REPORT_HOUR=${WEEKLY_REPORT_HOUR:-20}
+      - WEEKLY_REPORT_MINUTE=${WEEKLY_REPORT_MINUTE:-0}
+      - WEEKLY_REPORT_DAY=${WEEKLY_REPORT_DAY:-sun}
+      - DATABASE_URL=sqlite:///./data/study_bot.db
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=${DEBUG:-false}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - feishu-bot-network
+
+networks:
+  feishu-bot-network:
+    driver: bridge
