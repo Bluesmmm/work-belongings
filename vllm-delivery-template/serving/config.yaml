@@ -1,0 +1,21 @@
+# vLLM Server Configuration
+# Reference: https://docs.vllm.ai/en/latest/configuration/engine_args/
+
+# Model configuration
+model: "Qwen/Qwen2.5-3B-Instruct"
+
+# Server configuration
+port: 8000
+api_key: "token-abc123"
+
+# Engine configuration
+dtype: "auto"
+gpu_memory_utilization: 0.9
+max_model_len: 8192
+
+# Advanced options (uncomment to enable)
+# tensor_parallel_size: 1
+# block_size: 16
+# swap_space: 4
+# max_num_batched_tokens: 8192
+# max_num_seqs: 256

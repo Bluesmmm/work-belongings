@@ -23,10 +23,32 @@ class MessageHandler:
         user_id = data.event.sender.sender_id.user_id
         content = json.loads(message.content)
         text = content.get("text", "").strip()
-        
+
         print(f"收到消息 from {user_id}: {text}")
-        
-        # 命令路由
+
+        # 自定义关键词映射（无斜杠触发）
+        keyword_map = {
+            "今日": "/今日",
+            "今天": "/今日",
+            "今日计划": "/今日",
+            "学习计划": "/今日",
+            "打卡": "/打卡",
+            "我要打卡": "/打卡",
+            "学习打卡": "/打卡",
+            "进度": "/进度",
+            "学习进度": "/进度",
+            "里程碑": "/里程碑",
+            "周报": "/周报",
+            "帮助": "/帮助",
+        }
+
+        # 检查是否匹配关键词
+        for keyword, command in keyword_map.items():
+            if text == keyword or text.startswith(keyword):
+                await self._handle_command(user_id, message, command)
+                return
+
+        # 命令路由（斜杠开头）
         if text.startswith("/") or text.startswith("／"):
             await self._handle_command(user_id, message, text)
         else:

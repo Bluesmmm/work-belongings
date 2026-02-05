@@ -10,9 +10,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
-from lark_oapi import Client
-from lark_oapi.api.im.v1 import P2ImMessageReceiveV1
-from lark_oapi.card.builder import CardActionHandler, CardAction
+from lark_oapi import Client, CardActionHandler
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -206,7 +204,7 @@ def main():
     
     # 启动服务
     uvicorn.run(
-        "main:app",
+        app,
         host=settings.host,
         port=settings.port,
         reload=settings.debug,
