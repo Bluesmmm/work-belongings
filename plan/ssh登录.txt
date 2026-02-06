@@ -1,1 +1,0 @@
-ssh seeta "ls -la"
