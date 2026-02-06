@@ -30,6 +30,9 @@ def load_config(config_path: str) -> dict:
 
 def build_command(config: dict) -> list[str]:
     """Build vllm serve command from configuration."""
+    if "model" not in config:
+        raise ValueError("Configuration must contain a 'model' key")
+
     cmd = [
         "vllm", "serve", config["model"],
         "--port", str(config.get("port", 8000)),
@@ -38,6 +41,10 @@ def build_command(config: dict) -> list[str]:
         "--gpu-memory-utilization", str(config.get("gpu_memory_utilization", 0.9)),
         "--max-model-len", str(config.get("max_model_len", 8192)),
     ]
+
+    # Enable Prometheus metrics endpoint (default: true)
+    if config.get("enable_metrics", True):
+        cmd.append("--enable-metrics")
 
     # Optional advanced parameters
     if config.get("enforce_eager", False):

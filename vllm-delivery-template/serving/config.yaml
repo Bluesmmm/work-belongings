@@ -6,12 +6,18 @@ model: "Qwen/Qwen2.5-3B-Instruct"
 
 # Server configuration
 port: 8000
+# WARNING: Replace with a strong, unique API key in production
 api_key: "token-abc123"
 
 # Engine configuration
 dtype: "auto"
 gpu_memory_utilization: 0.9
 max_model_len: 8192
+
+# Metrics & Monitoring
+# Enable Prometheus metrics endpoint at /metrics
+# Access: http://localhost:8000/metrics
+enable_metrics: true
 
 # Advanced options (uncomment to enable)
 # tensor_parallel_size: 1
