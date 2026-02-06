@@ -19,7 +19,7 @@ from openai import OpenAI
 def smoke_test(
     base_url: str = "http://localhost:8000/v1",
     api_key: str = "token-abc123",
-    model: str = "test-model",
+    model: str = "Qwen/Qwen2.5-3B-Instruct",
 ) -> bool:
     """Run smoke test against vLLM server.
 
@@ -77,7 +77,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run smoke test against vLLM server")
     parser.add_argument("--base-url", default="http://localhost:8000/v1", help="Server base URL")
     parser.add_argument("--api-key", default="token-abc123", help="API key")
-    parser.add_argument("--model", default="test-model", help="Model name")
+    parser.add_argument("--model", default="Qwen/Qwen2.5-3B-Instruct", help="Model name")
 
     args = parser.parse_args()
 
