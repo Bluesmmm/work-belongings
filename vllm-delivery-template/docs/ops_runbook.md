@@ -110,6 +110,100 @@ Create `/etc/logrotate.d/vllm`:
 }
 ```
 
+## Monitoring with Prometheus + Grafana
+
+### Quick Start
+
+```bash
+# Start monitoring stack (from project root)
+docker compose -f observability/docker-compose.yml up -d
+
+# Access Grafana
+# URL: http://localhost:3000
+# Credentials: admin / admin
+```
+
+### Key Metrics
+
+| Metric | Prometheus Query | Meaning |
+|--------|-----------------|---------|
+| **QPS** | `rate(vllm:num_requests_total[1m])` | Requests per second |
+| **P95 Latency** | `histogram_quantile(0.95, rate(vllm:time_per_request_seconds_bucket[1m]))` | 95% of requests complete faster |
+| **TTFT** | `histogram_quantile(0.95, rate(vllm:time_to_first_token_seconds_bucket[1m]))` | Time to first token |
+| **Queue Size** | `vllm:waiting_queue_size` | Requests waiting in queue |
+| **GPU Memory** | `vllm:gpu_cache_usage_perc` | KV cache memory usage |
+| **Concurrent** | `vllm:num_requests_running` | Currently processing requests |
+
+### Health Status Assessment
+
+Use this table to quickly assess system health:
+
+| Status | Queue | GPU Memory | P95 Latency | Action |
+|--------|-------|------------|-------------|--------|
+| **Healthy** | < 10 | < 80% | < 500ms | Monitor |
+| **Congested** | 10-50 | 80-95% | 500ms-2s | Plan scale |
+| **Critical** | > 50 | > 95% | > 2s | Scale now |
+
+### Common Scenarios
+
+#### High Queue, Normal GPU Memory
+**Diagnosis**: CPU bottleneck or `max_num_seqs` too low
+
+**Solution**:
+```yaml
+# Increase concurrent processing
+max_num_seqs: 256
+```
+
+#### High GPU Memory, Normal Queue
+**Diagnosis**: Memory leak or models too large
+
+**Solution**:
+```yaml
+# Reduce context window
+max_model_len: 4096
+
+# Or enable CPU offloading
+swap_space: 4
+```
+
+#### High Latency, Low Queue
+**Diagnosis**: Batch size too small or model loading
+
+**Solution**:
+```yaml
+# Increase batch size
+max_num_batched_tokens: 16384
+```
+
+### Prometheus Queries for Troubleshooting
+
+```promql
+# Find preemption rate (indicates memory pressure)
+rate(vllm:num_preemption[5m])
+
+# Check error rate
+rate(vllm:num_requests_finished[5m]) - rate(vllm:num_requests_success[5m])
+
+# Average tokens per second
+rate(vllm:num_generation_tokens[5m]) / rate(vllm:num_requests_finished[5m])
+
+# KV cache blocks available
+vllm:num_gpu_blocks - vllm:num_used_gpu_blocks
+```
+
+For complete monitoring setup, see [Observability README](../observability/README.md).
+
+### Prometheus Direct Access
+
+```bash
+# Query metrics directly
+curl 'http://localhost:9090/api/v1/query?query=vllm:waiting_queue_size'
+
+# Check target status
+curl http://localhost:9090/api/v1/targets
+```
+
 ## Performance Tuning
 
 ### Throughput Optimization

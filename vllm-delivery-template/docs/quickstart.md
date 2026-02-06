@@ -147,8 +147,52 @@ Make sure the server is running. Check terminal where you launched it.
 ### "Model not found"
 The model will download automatically on first run. Check your internet connection.
 
+## Monitoring & Observability
+
+### Quick Start with Monitoring
+
+Start the monitoring stack alongside your vLLM server:
+
+```bash
+# In one terminal: Start vLLM server (metrics enabled by default)
+python serving/launch.py
+
+# In another terminal: Start Prometheus + Grafana
+docker compose -f observability/docker-compose.yml up -d
+```
+
+### Access Grafana Dashboard
+
+1. Open http://localhost:3000 in your browser
+2. Login with `admin` / `admin`
+3. Open the **vLLM Monitoring Dashboard**
+
+### Key Metrics at a Glance
+
+| Metric | What It Shows | Healthy Range |
+|--------|---------------|---------------|
+| **QPS** | Requests per second | Matches your load |
+| **Queue Size** | Requests waiting | < 10 |
+| **GPU Memory** | KV cache usage | < 80% |
+| **P95 Latency** | 95th percentile request time | < 500ms |
+| **TTFT** | Time to first token | < 500ms |
+
+### Verify Metrics Endpoint
+
+```bash
+curl http://localhost:8000/metrics | grep vllm
+```
+
+Expected output includes:
+- `vllm:num_requests_total`
+- `vllm:time_to_first_token_seconds`
+- `vllm:gpu_cache_usage_perc`
+
+For detailed monitoring setup and interpretation, see the [Observability README](../observability/README.md).
+
 ## Next Steps
 
 - Read [Configuration Reference](configuration.md) for advanced options
 - Check [Ops Runbook](ops_runbook.md) for deployment guidance
 - Run `pytest tests/` for the full test suite
+- Explore [Monitoring Guide](../observability/README.md) for detailed observability setup
