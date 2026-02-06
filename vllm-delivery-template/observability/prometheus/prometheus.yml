@@ -1,0 +1,25 @@
+# Prometheus configuration for vLLM metrics scraping
+# Reference: https://docs.vllm.ai/en/stable/design/metrics/
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'vllm-monitoring'
+
+scrape_configs:
+  # vLLM metrics endpoint
+  # The vLLM server exposes Prometheus metrics at /metrics when --enable-metrics is set
+  - job_name: 'vllm-server'
+    static_configs:
+      - targets: ['host.docker.internal:8000']
+        labels:
+          service: 'vllm-inference'
+          env: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
