@@ -1,0 +1,86 @@
+# Benchmark Configuration for vLLM Load Testing
+#
+# This file contains the default parameters for load testing vLLM servers.
+# You can override these values via command-line arguments.
+#
+# Usage:
+#   python benchmark/load_test.py --config benchmark/config/default.yaml
+#   python benchmark/load_test.py --concurrency 20 --num-requests 500
+
+# Server connection settings
+server:
+  # Base URL of the vLLM server (OpenAI-compatible API endpoint)
+  base_url: "http://localhost:8000/v1"
+
+  # API key for authentication (vLLM default)
+  api_key: "token-abc123"
+
+  # Model name to use for requests
+  model: "Qwen/Qwen2.5-3B-Instruct"
+
+# Load test parameters
+load:
+  # Number of concurrent requests to send simultaneously
+  # Higher values increase load but may cause timeouts
+  concurrency: 10
+
+  # Total number of requests to send during the test
+  num_requests: 100
+
+  # Request rate limit in requests per second (null = unlimited)
+  # Setting this creates a constant load pattern
+  request_rate: null
+
+  # Number of warmup requests before the actual test
+  # Warmup helps the model reach stable performance state
+  warmup_requests: 10
+
+  # Timeout for each request in seconds
+  request_timeout: 120
+
+# Prompt configuration
+prompt:
+  # Target input token length (approximate)
+  # This affects the prompt generation strategy
+  input_length: 512
+
+  # Target output token length (max_tokens in API request)
+  output_length: 128
+
+  # Prompt generation strategy:
+  #   - "random": Generate random prompts (default)
+  #   - "fixed": Use fixed_prompt below
+  prompt_type: "random"
+
+  # Fixed prompt to use when prompt_type is "fixed"
+  fixed_prompt: "Explain quantum computing in simple terms."
+
+# Metrics collection settings
+metrics:
+  # Prometheus server URL for collecting server-side metrics
+  prometheus_url: "http://localhost:9090"
+
+  # Whether to collect Prometheus metrics during test execution
+  collect_during_test: true
+
+  # Interval in seconds between Prometheus scrapes
+  scrape_interval: 15
+
+# Report generation settings
+report:
+  # Directory where benchmark reports will be saved
+  output_dir: "benchmark/reports"
+
+  # Report formats to generate
+  formats:
+    - json
+    - markdown
+
+  # Percentiles to include in latency calculations
+  include_percentiles:
+    - 50
+    - 95
+    - 99
+
+  # Whether to include Prometheus metrics in the report
+  include_prometheus_metrics: true
